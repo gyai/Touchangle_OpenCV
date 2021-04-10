@@ -21,6 +21,28 @@
 import cv2
 import re
 import glob
+import numpy as np
+
+#楕円フィットさせるための関数
+def drawEllipseWithBox(img_ary, box, color, enbNumber=True, lineThickness=1):
+    for i, img in enumerate(img_ary):
+        cv2.ellipse(img, box, color, lineThickness, cv2.LINE_AA)
+
+        # 中心位置をマーク
+        cx = int(box[0][0])
+        cy = int(box[0][1])
+        cv2.drawMarker(img, (cx,cy), color, markerType=cv2.MARKER_CROSS, markerSize=10, thickness=1)
+
+        # 外角矩形描画
+        vtx = np.int0(cv2.boxPoints(box))
+        for j in range(0, 4):
+            cv2.line(img, (vtx[j,0],vtx[j,1]), (vtx[(j+1)%4, 0],vtx[(j+1)%4, 1]), 
+                        color, lineThickness, lineType=cv2.LINE_AA)
+        if i == 0 :
+            if enbNumber:
+                cv2.putText(img, str(i+1), (cx+3,cy+3), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 1,cv2.LINE_AA)
+        else:
+            cv2.putText(img, str(i+1), (cx+3,cy+3), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 1,cv2.LINE_AA)
 
 files = glob.glob("img/*.png")
 img_datas = [] #先に配列作っておけば、読み込んだ画像データを配列内に追加してくれる？(上書きしないよな。。？)
@@ -33,15 +55,34 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
     _, binimg = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     binimg = cv2.bitwise_not(binimg)
 
-    # 画像小さいので縦横50倍に拡大    
-    res = cv2.resize(binimg, None ,fx=50 ,fy=50 ,interpolation = cv2.INTER_CUBIC)
+    # 結果画像表示
+    bimg = img // 2 + 128  # 結果画像の黒の部分を灰色にする。
+    resimg = cv2.merge((bimg,bimg,bimg)) 
 
-    # ウィンドウに表示
-    cv2.imshow('f',res)
-    cv2.waitKey(1)
-    cv2.destroyAllWindows()
+    # 輪郭取得
+    contours,hierarchy =  cv2.findContours(binimg,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    for i, cnt in enumerate(contours): # 引数にリストなどのイテラブルオブジェクトを指定する。インデックス番号, 要素の順に取得できる。
+        if len(contours[i]) >= 5:
+            # 楕円フィッティング
+            ellipse = cv2.fitEllipse(cnt)
+            print(ellipse)
+
+            cx = int(ellipse[0][0])
+            cy = int(ellipse[0][1])
+
+            # 楕円描画
+            resimg = cv2.ellipse(resimg,ellipse,(255,0,0),2)
+            cv2.drawMarker(resimg, (cx,cy), (0,0,255), markerType=cv2.MARKER_CROSS, markerSize=10, thickness=1)
+            cv2.putText(resimg, str(i+1), (cx+3,cy+3), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,80,255), 1,cv2.LINE_AA)
+            print(i,cnt)
+            cv2.imshow('resimg',resimg)
+            cv2.waitKey()
+
+
+
 
     #ここまでで、全部の画像データが白黒の二値化されて表示できるようになった
+
 
 
 
