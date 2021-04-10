@@ -16,3 +16,26 @@
 # →全部画像処理かけて長短の比率出す(この時、セクション情報とタスク番号はわかるようにしたい)→それを一つずつintリストに入れる→割合計算
 # 2.各セクションの該当タスクだけ画像処理以降の処理をする。
 # #
+
+
+import cv2
+import re
+import glob
+
+files = glob.glob("img/*.png")
+img_datas = [] #先に配列作っておけば、読み込んだ画像データを配列内に追加してくれる？(上書きしないよな。。？)
+
+for f in files: #imageフォルダ下の全セクションフォルダ文繰り返す(1_1~5_5)
+    #全部の画像データを取得。
+    img = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
+    img_datas.append(img)
+    
+    res = cv2.resize(img, None ,fx=50 ,fy=50 ,interpolation = cv2.INTER_CUBIC)
+    cv2.imshow('f',res)
+    cv2.waitKey(1)
+    cv2.destroyAllWindows()
+    #ここまでで、全部の画像データがグレースケール化されて表示できるようになった
+    
+
+
+ 
