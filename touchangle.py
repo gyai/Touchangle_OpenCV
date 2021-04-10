@@ -25,17 +25,24 @@ import glob
 files = glob.glob("img/*.png")
 img_datas = [] #先に配列作っておけば、読み込んだ画像データを配列内に追加してくれる？(上書きしないよな。。？)
 
-for f in files: #imageフォルダ下の全セクションフォルダ文繰り返す(1_1~5_5)
-    #全部の画像データを取得。
-    img = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
-    img_datas.append(img)
-    
-    res = cv2.resize(img, None ,fx=50 ,fy=50 ,interpolation = cv2.INTER_CUBIC)
+for f in files: #imageフォルダ下の全画像データ分繰り返す
+    #全部の画像データを取得+グレースケール化
+    img = cv2.imread(f,cv2.IMREAD_GRAYSCALE) 
+
+    # 二値化
+    _, binimg = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    binimg = cv2.bitwise_not(binimg)
+
+    # 画像小さいので縦横50倍に拡大    
+    res = cv2.resize(binimg, None ,fx=50 ,fy=50 ,interpolation = cv2.INTER_CUBIC)
+
+    # ウィンドウに表示
     cv2.imshow('f',res)
     cv2.waitKey(1)
     cv2.destroyAllWindows()
-    #ここまでで、全部の画像データがグレースケール化されて表示できるようになった
-    
+
+    #ここまでで、全部の画像データが白黒の二値化されて表示できるようになった
+
 
 
  
