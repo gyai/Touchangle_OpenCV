@@ -27,7 +27,7 @@ files = glob.glob("img/*.png")
 img_datas = [] #先に配列作っておけば、読み込んだ画像データを配列内に追加してくれる？(上書きしないよな。。？)
 
 for f in files: #imageフォルダ下の全画像データ分繰り返す
-    '''
+    
     #全部の画像データを取得+グレースケール化
     img = cv2.imread(f,cv2.IMREAD_GRAYSCALE) 
 
@@ -43,6 +43,7 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
     # 二値化
     _, binimg = cv2.threshold(gray1, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     binimg = cv2.bitwise_not(binimg)
+    '''
     # 結果画像表示
     # bimg = binimg // 2 + 128  # 結果画像の黒の部分を灰色にする。
     bimg = binimg // 4 + 255 * 3 //4
@@ -50,8 +51,9 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
 
     # 輪郭取得
     contours,hierarchy =  cv2.findContours(binimg,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
     for i, cnt in enumerate(contours): # 引数にリストなどのイテラブルオブジェクトを指定する。インデックス番号, 要素の順に取得できる。
-        if len(contours[i]) >= 5:
+        if len(contours[i]) >= 5: #楕円抽出するためには輪郭（頂点？）が5つ以上必要なので、fitEllipse()がエラーを吐いてしまうことあり。エラー回避はこれで良いのか怪しい。
             # 楕円フィッティング
             ellipse = cv2.fitEllipse(cnt)
             print(ellipse)
@@ -60,12 +62,12 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
             cy = int(ellipse[0][1])
 
             # 楕円描画
-            resimg = cv2.ellipse(resimg,ellipse,(255,0,0),2)
+            resimg = cv2.ellipse(resimg,ellipse,(255,0,0),2) # cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
             cv2.drawMarker(resimg, (cx,cy), (0,0,255), markerType=cv2.MARKER_CROSS, markerSize=10, thickness=1)
             cv2.putText(resimg, str(i+1), (cx+3,cy+3), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,80,255), 1,cv2.LINE_AA)
-        print(i,cnt)
-        cv2.imshow('resimg',resimg)
-        cv2.waitKey()
+            # print(i,cnt)
+            cv2.imshow('resimg',resimg)
+            cv2.waitKey()
 
 
 
