@@ -34,16 +34,7 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
     # 二値化
     _, binimg = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     binimg = cv2.bitwise_not(binimg)
-    '''
-    img = cv2.imread(f,cv2.IMREAD_COLOR)
-    # グレイスケール化
-    gray1 = cv2.bitwise_and(img[:,:,0], img[:,:,1])
-    gray1 = cv2.bitwise_and(gray1, img[:,:,2])
 
-    # 二値化
-    _, binimg = cv2.threshold(gray1, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    binimg = cv2.bitwise_not(binimg)
-    '''
     # 結果画像表示
     # bimg = binimg // 2 + 128  # 結果画像の黒の部分を灰色にする。
     bimg = binimg // 4 + 255 * 3 //4
@@ -65,9 +56,9 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
             resimg = cv2.ellipse(resimg,ellipse,(255,0,0),2) # cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
             cv2.drawMarker(resimg, (cx,cy), (0,0,255), markerType=cv2.MARKER_CROSS, markerSize=10, thickness=1)
             cv2.putText(resimg, str(i+1), (cx+3,cy+3), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,80,255), 1,cv2.LINE_AA)
-            # print(i,cnt)
             cv2.imshow('resimg',resimg)
             cv2.waitKey()
+
 
 
 
