@@ -23,8 +23,7 @@ import re
 import glob
 import numpy as np
 
-files = glob.glob("img/*.png")
-img_datas = [] #先に配列作っておけば、読み込んだ画像データを配列内に追加してくれる？(上書きしないよな。。？)
+files = sorted(glob.glob("img/*.png"))
 
 for f in files: #imageフォルダ下の全画像データ分繰り返す
     
@@ -47,23 +46,26 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
         if len(contours[i]) >= 5: #楕円抽出するためには輪郭（頂点？）が5つ以上必要なので、fitEllipse()がエラーを吐いてしまうことあり。エラー回避はこれで良いのか怪しい。
             # 楕円フィッティング
             ellipse = cv2.fitEllipse(cnt)
-            print(ellipse)
+            '''
+            ellipseの中身　　((cx, cy), (h, w), deg) 例)print(ellipse) -> ((7.5, 17.0), (4.073996067047119, 5.374904155731201), 116.52420043945312)
+            cx - 中心X
+            cy - 中心Y
+            h - 楕円縦方向の長さ
+            w - 楕円横方向の長さ
+            deg - 傾き角度
+            '''
+
+            # taskdata[繰り返し番号]に(被験者-セクション、task番号、ベッタリか側面か、楕円の長軸短軸の比率)　後から「タスク番号」や「被験者セクション」などで検索かけられるようにしたい
+            tskdata = {''}       
+
+            # 楕円描画
+            resimg = cv2.ellipse(resimg,ellipse,(255,0,0),1) # cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
 
             cx = int(ellipse[0][0])
             cy = int(ellipse[0][1])
+    cv2.imshow('resimg',resimg)
+    cv2.waitKey()
 
-            # 楕円描画
-            resimg = cv2.ellipse(resimg,ellipse,(255,0,0),2) # cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
-            cv2.drawMarker(resimg, (cx,cy), (0,0,255), markerType=cv2.MARKER_CROSS, markerSize=10, thickness=1)
-            cv2.putText(resimg, str(i+1), (cx+3,cy+3), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,80,255), 1,cv2.LINE_AA)
-            cv2.imshow('resimg',resimg)
-            cv2.waitKey()
-
-
-
-
-
-    #ここまでで、全部の画像データが白黒の二値化されて表示できるようになった
 
 
 
