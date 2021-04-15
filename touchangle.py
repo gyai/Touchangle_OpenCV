@@ -56,8 +56,12 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
             '''
 
             # taskdata[繰り返し番号]に(被験者-セクション、task番号、ベッタリか側面か、楕円の長軸短軸の比率)　後から「タスク番号」や「被験者セクション」などで検索かけられるようにしたい
-            tskdata = np.ndarray()    
-
+            taskname = f[4:13]
+            tyoujiku = ellipse[1][0]
+            tannjiku = ellipse[1][1]
+            jyuotai = tannjiku/tyoujiku
+            tskdata = np.array([f, "状態"+jyotai, "長軸"+tyoujiku, "短軸"+tannjiku])    
+            print(taskdata)
             # 楕円描画
             resimg = cv2.ellipse(resimg,ellipse,(255,0,0),1) # cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
 
