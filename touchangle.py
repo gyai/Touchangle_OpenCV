@@ -24,7 +24,7 @@ import glob
 import numpy as np
 
 files = sorted(glob.glob("img/*.png"))
-
+tskdata = np.array([])
 for f in files: #imageフォルダ下の全画像データ分繰り返す
     
     #全部の画像データを取得+グレースケール化
@@ -51,24 +51,34 @@ for f in files: #imageフォルダ下の全画像データ分繰り返す
             cx - 中心X
             cy - 中心Y
             h - 楕円縦方向の長さ
-            w - 楕円横方向の長さ
+            w - 楕円横方向の長さ　→　長短逆っぽい？
             deg - 傾き角度
             '''
 
             # taskdata[繰り返し番号]に(被験者-セクション、task番号、ベッタリか側面か、楕円の長軸短軸の比率)　後から「タスク番号」や「被験者セクション」などで検索かけられるようにしたい
             taskname = f[4:13]
-            tyoujiku = ellipse[1][0]
-            tannjiku = ellipse[1][1]
-            jyuotai = tannjiku/tyoujiku
-            tskdata = np.array([f, "状態"+jyotai, "長軸"+tyoujiku, "短軸"+tannjiku])    
-            print(taskdata)
+            tyoujiku = ellipse[1][1]
+            tannjiku = ellipse[1][0]
+            jyotai = tannjiku/tyoujiku # 今は比率を表示している。この後指の状態を基準決めて判別する
+            tskdata = np.append(tskdata, taskname)
+            tskdata = np.append(tskdata, str(jyotai))  
+            ## tskdataに[task番号,比率,task番号,比率,~~~]で格納されてる ##
+
             # 楕円描画
             resimg = cv2.ellipse(resimg,ellipse,(255,0,0),1) # cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
 
-            cx = int(ellipse[0][0])
-            cy = int(ellipse[0][1])
-    cv2.imshow('resimg',resimg)
-    cv2.waitKey()
+
+   # cv2.imshow(taskname,resimg)
+   # cv2.waitKey()
+   # np.where(配列名　条件)
+
+index = np.where(tskdata == "1_1task30")
+print(index)
+print(tskdata[index])
+print(tskdata[index[0]+1])
+print(tskdata[index[0]+2])
+
+
 
 
 
